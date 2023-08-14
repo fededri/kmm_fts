@@ -1,0 +1,16 @@
+-- Merging decision tree log ---
+manifest
+ADDED from /Users/federicotorres/Develop/kmm_fts_poc/kmm_fts/shared/build/intermediates/tmp/ProcessLibraryManifest/debug/tempAndroidManifest6073273511700651946.xml:2:13-83
+INJECTED from /Users/federicotorres/Develop/kmm_fts_poc/kmm_fts/shared/build/intermediates/tmp/ProcessLibraryManifest/debug/tempAndroidManifest6073273511700651946.xml:2:13-83
+	package
+		INJECTED from /Users/federicotorres/Develop/kmm_fts_poc/kmm_fts/shared/build/intermediates/tmp/ProcessLibraryManifest/debug/tempAndroidManifest6073273511700651946.xml
+	xmlns:android
+		ADDED from /Users/federicotorres/Develop/kmm_fts_poc/kmm_fts/shared/build/intermediates/tmp/ProcessLibraryManifest/debug/tempAndroidManifest6073273511700651946.xml:2:23-81
+uses-sdk
+INJECTED from /Users/federicotorres/Develop/kmm_fts_poc/kmm_fts/shared/build/intermediates/tmp/ProcessLibraryManifest/debug/tempAndroidManifest6073273511700651946.xml reason: use-sdk injection requested
+INJECTED from /Users/federicotorres/Develop/kmm_fts_poc/kmm_fts/shared/build/intermediates/tmp/ProcessLibraryManifest/debug/tempAndroidManifest6073273511700651946.xml
+INJECTED from /Users/federicotorres/Develop/kmm_fts_poc/kmm_fts/shared/build/intermediates/tmp/ProcessLibraryManifest/debug/tempAndroidManifest6073273511700651946.xml
+	android:targetSdkVersion
+		INJECTED from /Users/federicotorres/Develop/kmm_fts_poc/kmm_fts/shared/build/intermediates/tmp/ProcessLibraryManifest/debug/tempAndroidManifest6073273511700651946.xml
+	android:minSdkVersion
+		INJECTED from /Users/federicotorres/Develop/kmm_fts_poc/kmm_fts/shared/build/intermediates/tmp/ProcessLibraryManifest/debug/tempAndroidManifest6073273511700651946.xml

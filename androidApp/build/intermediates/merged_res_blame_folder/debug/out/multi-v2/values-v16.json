@@ -1,0 +1,19 @@
+{
+    "logs": [
+        {
+            "outputFile": "com.fededri.kmmfts.android.androidApp-mergeDebugResources-40:/values-v16/values-v16.xml",
+            "map": [
+                {
+                    "source": "/Users/federicotorres/.gradle/caches/transforms-3/e5cf8c63655e045d6f7a67e3b005ad27/transformed/core-1.9.0/res/values-v16/values-v16.xml",
+                    "from": {
+                        "startLines": "2",
+                        "startColumns": "4",
+                        "startOffsets": "55",
+                        "endColumns": "65",
+                        "endOffsets": "116"
+                    }
+                }
+            ]
+        }
+    ]
+}
