@@ -4,7 +4,7 @@
             "outputFile": "com.fededri.kmmfts.android.androidApp-mergeDebugResources-40:/values-ru/values-ru.xml",
             "map": [
                 {
-                    "source": "/Users/federicotorres/.gradle/caches/transforms-3/c98aaa2f49296bb6e2b2d7acb898c73f/transformed/ui-1.4.3/res/values-ru/values-ru.xml",
+                    "source": "/Users/federicotorres/.gradle/caches/transforms-3/b28597b1c518faedec359aef7c22bb06/transformed/ui-1.4.3/res/values-ru/values-ru.xml",
                     "from": {
                         "startLines": "2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18",
                         "startColumns": "4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4",
@@ -21,7 +21,7 @@
                     }
                 },
                 {
-                    "source": "/Users/federicotorres/.gradle/caches/transforms-3/e5cf8c63655e045d6f7a67e3b005ad27/transformed/core-1.9.0/res/values-ru/values-ru.xml",
+                    "source": "/Users/federicotorres/.gradle/caches/transforms-3/7c58b757c7052ab85b0ca6bc87b548cd/transformed/core-1.9.0/res/values-ru/values-ru.xml",
                     "from": {
                         "startLines": "2",
                         "startColumns": "4",

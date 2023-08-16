@@ -1,0 +1,5 @@
+com.fededri.kmmfts.test.shared-androidTest-0 /Users/federicotorres/Develop/kmm_fts_poc/kmm_fts/shared/build/generated/res/resValues/androidTest/debug
+com.fededri.kmmfts.test.shared-mergeDebugAndroidTestResources-1 /Users/federicotorres/Develop/kmm_fts_poc/kmm_fts/shared/build/intermediates/incremental/debugAndroidTest/mergeDebugAndroidTestResources/merged.dir
+com.fededri.kmmfts.test.shared-mergeDebugAndroidTestResources-2 /Users/federicotorres/Develop/kmm_fts_poc/kmm_fts/shared/build/intermediates/incremental/debugAndroidTest/mergeDebugAndroidTestResources/stripped.dir
+com.fededri.kmmfts.test.shared-merged_res-3 /Users/federicotorres/Develop/kmm_fts_poc/kmm_fts/shared/build/intermediates/merged_res/debugAndroidTest
+com.fededri.kmmfts.test.shared-packaged_res-4 /Users/federicotorres/Develop/kmm_fts_poc/kmm_fts/shared/build/intermediates/packaged_res/debug

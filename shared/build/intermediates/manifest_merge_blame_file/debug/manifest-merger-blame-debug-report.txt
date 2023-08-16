@@ -3,5 +3,6 @@
 3    package="com.fededri.kmmfts" >
 4
 5    <uses-sdk android:minSdkVersion="30" />
+5-->/Users/federicotorres/Develop/kmm_fts_poc/kmm_fts/shared/build/intermediates/tmp/ProcessLibraryManifest/debug/tempAndroidManifest16413313729366251599.xml
 6
 7</manifest>
