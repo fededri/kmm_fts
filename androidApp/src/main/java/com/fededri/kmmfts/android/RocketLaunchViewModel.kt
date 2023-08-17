@@ -30,4 +30,10 @@ class RocketLaunchViewModel : ViewModel() {
             }
         }
     }
+
+    fun searchRocketLaunches(searchQuery: String) {
+        viewModelScope.launch {
+
+        }
+    }
 }
