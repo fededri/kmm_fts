@@ -1,4 +1,7 @@
+import kotlin.Boolean;
+
 CREATE TABLE Launch (
+    id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
     flightNumber INTEGER NOT NULL,
     missionName TEXT NOT NULL,
     details TEXT,
@@ -8,6 +11,67 @@ CREATE TABLE Launch (
     patchUrlLarge TEXT,
     articleUrl TEXT
 );
+
+CREATE VIRTUAL TABLE LaunchFTS USING fts5(
+        id INTEGER UNINDEXED,
+        flightNumber INTEGER NOT NULL,
+        missionName TEXT NOT NULL,
+        details TEXT,
+        launchSuccess INTEGER AS Boolean DEFAULT NULL,
+        launchDateUTC TEXT NOT NULL,
+        patchUrlSmall TEXT,
+        patchUrlLarge TEXT,
+        articleUrl TEXT,
+        tokenize = 'trigram'
+);
+
+CREATE TRIGGER launch_after_insert
+AFTER INSERT ON Launch
+BEGIN
+  INSERT INTO LaunchFTS (
+    id,
+    flightNumber,
+    missionName,
+    details,
+    launchSuccess,
+    launchDateUTC,
+    patchUrlSmall,
+    patchUrlLarge,
+    articleUrl
+  )
+  VALUES (
+    new.id,
+    new.flightNumber,
+    new.missionName,
+    new.details,
+    new.launchSuccess,
+    new.launchDateUTC,
+    new.patchUrlSmall,
+    new.patchUrlLarge,
+    new.articleUrl
+  );
+END;
+
+CREATE TRIGGER launch_after_update
+AFTER UPDATE ON Launch
+BEGIN
+  UPDATE LaunchFTS SET
+    flightNumber = new.flightNumber,
+    missionName = new.missionName,
+    details = new.details,
+    launchSuccess = new.launchSuccess,
+    launchDateUTC = new.launchDateUTC,
+    patchUrlSmall = new.patchUrlSmall,
+    patchUrlLarge = new.patchUrlLarge,
+    articleUrl = new.articleUrl
+  WHERE id = new.id;
+END;
+
+CREATE TRIGGER launch_after_delete
+AFTER DELETE ON Launch
+BEGIN
+  DELETE FROM LaunchFTS WHERE id = old.id;
+END;
 
 insertLaunch:
 INSERT INTO Launch(flightNumber, missionName, details, launchSuccess, launchDateUTC, patchUrlSmall, patchUrlLarge, articleUrl)

@@ -39,7 +39,7 @@ class MainActivity : ComponentActivity() {
             val searchQuery = remember { mutableStateOf("") }
 
             LaunchedEffect(key1 = viewModel, block = {
-                viewModel.fetchRocketLaunches(spaceXSdk, true)
+                viewModel.fetchRocketLaunches(spaceXSdk, false)
             })
 
             MyApplicationTheme {

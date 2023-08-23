@@ -42,6 +42,7 @@ internal class RocketLaunchRepository(databaseDriverFactory: DatabaseDriverFacto
     }
 
     private fun mapLaunchSelecting(
+        id: Long,
         flightNumber: Long,
         missionName: String,
         details: String?,
