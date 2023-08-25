@@ -4,7 +4,10 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -16,19 +19,19 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.paging.compose.LazyPagingItems
+import androidx.paging.compose.collectAsLazyPagingItems
 import com.fededri.kmmfts.DatabaseDriverFactory
-import com.fededri.kmmfts.Greeting
 import com.fededri.kmmfts.SpaceXSDK
-import kotlinx.coroutines.MainScope
+import com.fededri.kmmfts.entities.RocketLaunch
 import kotlinx.coroutines.cancel
-import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
-    private val mainScope = MainScope()
     private val spaceXSdk = SpaceXSDK(DatabaseDriverFactory(this))
 
     private val viewModel: RocketLaunchViewModel by viewModels()
@@ -39,15 +42,17 @@ class MainActivity : ComponentActivity() {
             val searchQuery = remember { mutableStateOf("") }
 
             LaunchedEffect(key1 = viewModel, block = {
-                viewModel.fetchRocketLaunches(spaceXSdk, false)
+                viewModel.fetchRocketLaunches(spaceXSdk)
             })
+
+            val state = viewModel.state.collectAsState(initial = State())
 
             MyApplicationTheme {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colors.background
+                    color = MaterialTheme.colors.background,
                 ) {
-                    Column { // Wrap the content in a Column
+                    Column {
                         TextField(
                             value = searchQuery.value,
                             onValueChange = {
@@ -59,56 +64,57 @@ class MainActivity : ComponentActivity() {
                                 .padding(16.dp)
                         )
 
-                        val state = viewModel.state.collectAsState(initial = emptyList())
+                        if (state.value.didFinishRequest) {
+                            val launches = viewModel.flow(DatabaseDriverFactory(this@MainActivity))
+                                .collectAsLazyPagingItems()
 
-
-                        val filteredLaunches = state.value.filter {
-                            it.missionName.contains(searchQuery.value, true) ||
-                                    it.launchDateUTC.contains(searchQuery.value, true) ||
-                                    it.details?.contains(searchQuery.value, true) == true
+                            RocketLaunchesListView(launches = launches)
+                        } else {
+                           Box(
+                               contentAlignment = Alignment.Center,
+                               modifier = Modifier.fillMaxSize()
+                                   .padding(16.dp)
+                           ) {
+                                 CircularProgressIndicator()
+                           }
                         }
-
-                        LazyColumn(content = {
-                            items(filteredLaunches) {
-                                Card(
-                                    modifier = Modifier
-                                        .padding(16.dp)
-                                        .fillMaxWidth(),
-                                    backgroundColor = Color.Gray.copy(0.2f)
-                                ) {
-                                    Column {
-                                        Text(text = it.missionName, modifier = Modifier.padding(8.dp))
-                                        Text(text = it.launchDateUTC, modifier = Modifier.padding(8.dp))
-                                        Text(
-                                            text = it.details.orEmpty(),
-                                            modifier = Modifier.padding(8.dp)
-                                        )
-                                    }
-                                }
-                            }
-                        })
                     }
                 }
             }
         }
     }
-
-
-    override fun onDestroy() {
-        super.onDestroy()
-        mainScope.cancel()
-    }
 }
 
 @Composable
-fun GreetingView(text: String) {
-    Text(text = text)
-}
+fun RocketLaunchesListView(launches: LazyPagingItems<RocketLaunch>) {
+    LazyColumn {
+        items(launches.itemCount) { index ->
+            val launch = launches[index]
 
-@Preview
-@Composable
-fun DefaultPreview() {
-    MyApplicationTheme {
-        GreetingView("Hello, Android!")
+            if (launch != null) {
+                Card(
+                    modifier = Modifier
+                        .padding(16.dp)
+                        .fillMaxWidth(),
+                    backgroundColor = Color.Gray.copy(0.2f)
+                ) {
+                    Column {
+                        Text(
+                            text = launch.missionName,
+                            modifier = Modifier.padding(8.dp)
+                        )
+                        Text(
+                            text = launch.launchDateUTC,
+                            modifier = Modifier.padding(8.dp)
+                        )
+                        Text(
+                            text = launch.details.orEmpty(),
+                            modifier = Modifier.padding(8.dp)
+                        )
+                    }
+                }
+            }
+
+        }
     }
 }

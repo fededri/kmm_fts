@@ -84,3 +84,14 @@ selectAllLaunchesInfo:
 SELECT Launch.*
 FROM Launch;
 
+countLaunchesPaginated:
+SELECT COUNT(*)
+FROM Launch;
+
+selectLaunchesPaginated:
+SELECT *
+FROM Launch
+LIMIT :limit OFFSET :offset;
+
+isDatabaseEmpty:
+SELECT NOT EXISTS(SELECT 1 FROM Launch LIMIT 1);

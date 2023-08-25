@@ -13,18 +13,18 @@ class SpaceXSDK(databaseDriverFactory: DatabaseDriverFactory) {
 
 
     @Throws(Exception::class)
-    suspend fun getLaunches(forceReload: Boolean): List<RocketLaunch> =
+    suspend fun getLaunchesFromServer(callback: () -> Unit) =
         withContext(Dispatchers.IO) {
-            val cachedLaunches = database.getAllLaunches()
-            if (cachedLaunches.isNotEmpty() && !forceReload) {
-                cachedLaunches
-            } else {
+            if (database.isDatabaseEmpty()) {
                 api.getAllLaunches().also {
                     database.clearDatabase()
-                    val duplicatedLaunches = multiplyRocketLaunches(it)
                     // We just want more data in the database
+                    val duplicatedLaunches = multiplyRocketLaunches(it)
                     database.createLaunches(duplicatedLaunches)
+                    callback()
                 }
+            } else {
+                callback()
             }
         }
 

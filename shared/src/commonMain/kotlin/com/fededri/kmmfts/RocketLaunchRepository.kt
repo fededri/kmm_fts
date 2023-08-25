@@ -5,7 +5,7 @@ import com.fededri.kmmfts.entities.Patch
 import com.fededri.kmmfts.entities.RocketLaunch
 
 
-internal class RocketLaunchRepository(databaseDriverFactory: DatabaseDriverFactory) {
+class RocketLaunchRepository(databaseDriverFactory: DatabaseDriverFactory) {
     private val database = AppDatabase(databaseDriverFactory.createDriver())
     private val dbQuery = database.appDatabaseQueries
 
@@ -16,8 +16,23 @@ internal class RocketLaunchRepository(databaseDriverFactory: DatabaseDriverFacto
         }
     }
 
-    internal fun getAllLaunches(): List<RocketLaunch> {
+    fun getAllLaunches(): List<RocketLaunch> {
         return dbQuery.selectAllLaunchesInfo(::mapLaunchSelecting).executeAsList()
+    }
+
+    fun isDatabaseEmpty(): Boolean {
+        val isEmpty = dbQuery.isDatabaseEmpty().executeAsOne()
+        return isEmpty
+    }
+
+    fun getPaginatedLaunches(): QueryPagingSource<RocketLaunch> {
+        return QueryPagingSource(
+            dbQuery.countLaunchesPaginated(),
+            pageSize = 20,
+            searchQueryGetter = { offset, limit ->
+                dbQuery.selectLaunchesPaginated(limit.toLong(), offset, this::mapLaunchSelecting)
+            }
+        )
     }
 
     internal fun createLaunches(launches: List<RocketLaunch>) {
