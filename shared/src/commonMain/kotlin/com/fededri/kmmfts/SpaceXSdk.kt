@@ -1,6 +1,7 @@
 package com.fededri.kmmfts
 
-import com.fededri.kmmfts.entities.RocketLaunch
+import com.fededri.kmmfts.entities.Links
+import com.fededri.kmmfts.entities.RocketLaunchJson
 import com.fededri.kmmfts.network.SpaceXApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
@@ -28,16 +29,25 @@ class SpaceXSDK(databaseDriverFactory: DatabaseDriverFactory) {
             }
         }
 
-    private fun multiplyRocketLaunches(launches: List<RocketLaunch>): List<RocketLaunch> {
-        val duplicationCount = 1500
+    private fun multiplyRocketLaunches(launches: List<RocketLaunchJson>): List<RocketLaunchJson> {
+        val duplicationCount = 5000
 
-        val duplicatedList = ArrayList<RocketLaunch>(launches.size * duplicationCount)
+        val duplicatedList = ArrayList<RocketLaunchJson>(launches.size * duplicationCount)
         launches.forEach { item ->
             repeat(duplicationCount) {
                 duplicatedList.add(item)
             }
         }
 
-        return duplicatedList
+        // create a mock launch for search testing purposes
+        val customLaunch = RocketLaunchJson(
+            details = "Mock launch",
+            flightNumber = 16702,
+            links = Links(null, null),
+            launchSuccess = true,
+            missionName = "Cool mission",
+            launchDateUTC = "2021-08-01T00:00:00.000Z"
+        )
+        return duplicatedList + customLaunch
     }
 }

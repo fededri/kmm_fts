@@ -1,6 +1,6 @@
 package com.fededri.kmmfts.network
 
-import com.fededri.kmmfts.entities.RocketLaunch
+import com.fededri.kmmfts.entities.RocketLaunchJson
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.plugins.contentnegotiation.*
@@ -18,7 +18,7 @@ class SpaceXApi {
         }
     }
 
-    suspend fun getAllLaunches(): List<RocketLaunch> {
+    suspend fun getAllLaunches(): List<RocketLaunchJson> {
         return httpClient.get("https://api.spacexdata.com/v5/launches").body()
     }
 

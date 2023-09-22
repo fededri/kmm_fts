@@ -22,7 +22,7 @@ CREATE VIRTUAL TABLE LaunchFTS USING fts5(
         patchUrlSmall TEXT,
         patchUrlLarge TEXT,
         articleUrl TEXT,
-        tokenize = 'trigram'
+        tokenize = 'unicode61'
 );
 
 CREATE TRIGGER launch_after_insert
@@ -89,9 +89,39 @@ SELECT COUNT(*)
 FROM Launch;
 
 selectLaunchesPaginated:
-SELECT *
+SELECT id, missionName, launchDateUTC, details
 FROM Launch
 LIMIT :limit OFFSET :offset;
 
 isDatabaseEmpty:
 SELECT NOT EXISTS(SELECT 1 FROM Launch LIMIT 1);
+
+searchLaunchesPaginated:
+SELECT id, missionName, launchDateUTC, details
+FROM LaunchFTS
+WHERE LaunchFTS MATCH :searchQuery
+LIMIT :limit OFFSET :offset;
+
+countSearchLaunchesPaginated:
+SELECT COUNT(*)
+FROM LaunchFTS
+WHERE LaunchFTS MATCH :searchQuery;
+
+
+slowCountSearchLaunchesPaginated:
+SELECT COUNT(*)
+FROM Launch
+WHERE missionName LIKE '%' || :searchQuery || '%'
+OR details LIKE '%' || :searchQuery || '%'
+OR launchDateUTC LIKE '%' || :searchQuery || '%'
+OR flightNumber LIKE '%' || :searchQuery || '%'
+;
+
+slowSearchLaunchesPaginated:
+SELECT id, missionName, launchDateUTC, details
+FROM Launch
+WHERE missionName LIKE '%' || :searchQuery || '%'
+OR details LIKE '%' || :searchQuery || '%'
+OR launchDateUTC LIKE '%' || :searchQuery || '%'
+OR flightNumber LIKE '%' || :searchQuery || '%'
+LIMIT :limit OFFSET :offset;

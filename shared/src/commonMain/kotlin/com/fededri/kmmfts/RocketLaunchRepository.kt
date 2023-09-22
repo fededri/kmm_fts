@@ -1,14 +1,13 @@
 package com.fededri.kmmfts
 
-import com.fededri.kmmfts.entities.Links
-import com.fededri.kmmfts.entities.Patch
 import com.fededri.kmmfts.entities.RocketLaunch
+import com.fededri.kmmfts.entities.RocketLaunchJson
 
 
 class RocketLaunchRepository(databaseDriverFactory: DatabaseDriverFactory) {
     private val database = AppDatabase(databaseDriverFactory.createDriver())
     private val dbQuery = database.appDatabaseQueries
-
+    private val pageSize = 100
 
     internal fun clearDatabase() {
         dbQuery.transaction {
@@ -16,26 +15,76 @@ class RocketLaunchRepository(databaseDriverFactory: DatabaseDriverFactory) {
         }
     }
 
-    fun getAllLaunches(): List<RocketLaunch> {
-        return dbQuery.selectAllLaunchesInfo(::mapLaunchSelecting).executeAsList()
-    }
-
     fun isDatabaseEmpty(): Boolean {
-        val isEmpty = dbQuery.isDatabaseEmpty().executeAsOne()
-        return isEmpty
+        return dbQuery.isDatabaseEmpty().executeAsOne()
     }
 
-    fun getPaginatedLaunches(): QueryPagingSource<RocketLaunch> {
+    fun getPaginatedLaunchesBySearch(
+        searchQuery: String,
+        ftsEnabled: Boolean
+    ): QueryPagingSource<RocketLaunch> {
+        return if (!ftsEnabled) {
+            getNonFtsQuery(searchQuery)
+        } else {
+            getFtsQuery(searchQuery)
+        }
+    }
+
+    private fun getFtsQuery(searchQuery: String): QueryPagingSource<RocketLaunch> {
         return QueryPagingSource(
-            dbQuery.countLaunchesPaginated(),
-            pageSize = 20,
+            countQuery = if (searchQuery.isEmpty()) {
+                dbQuery.countLaunchesPaginated()
+            } else {
+                dbQuery.countSearchLaunchesPaginated(searchQuery)
+            },
+            pageSize = pageSize,
             searchQueryGetter = { offset, limit ->
-                dbQuery.selectLaunchesPaginated(limit.toLong(), offset, this::mapLaunchSelecting)
+                if (searchQuery.isEmpty()) {
+                    dbQuery.selectLaunchesPaginated(
+                        limit.toLong(),
+                        offset,
+                        mapLaunchSelecting
+                    )
+                } else {
+                    dbQuery.searchLaunchesPaginated(
+                        searchQuery,
+                        limit.toLong(),
+                        offset,
+                        mapLaunchSelecting
+                    )
+                }
             }
         )
     }
 
-    internal fun createLaunches(launches: List<RocketLaunch>) {
+    private fun getNonFtsQuery(searchQuery: String): QueryPagingSource<RocketLaunch> {
+        return QueryPagingSource(
+            countQuery = if (searchQuery.isEmpty()) {
+                dbQuery.countLaunchesPaginated()
+            } else {
+                dbQuery.slowCountSearchLaunchesPaginated(searchQuery)
+            },
+            pageSize = pageSize,
+            searchQueryGetter = { offset, limit ->
+                if (searchQuery.isEmpty()) {
+                    dbQuery.selectLaunchesPaginated(
+                        limit.toLong(),
+                        offset,
+                        mapLaunchSelecting
+                    )
+                } else {
+                    dbQuery.slowSearchLaunchesPaginated(
+                        searchQuery,
+                        limit.toLong(),
+                        offset,
+                        mapLaunchSelecting
+                    )
+                }
+            }
+        )
+    }
+
+    internal fun createLaunches(launches: List<RocketLaunchJson>) {
         dbQuery.transaction {
             launches.forEach { launch ->
                 insertLaunch(launch)
@@ -43,7 +92,7 @@ class RocketLaunchRepository(databaseDriverFactory: DatabaseDriverFactory) {
         }
     }
 
-    private fun insertLaunch(launch: RocketLaunch) {
+    private fun insertLaunch(launch: RocketLaunchJson) {
         dbQuery.insertLaunch(
             flightNumber = launch.flightNumber.toLong(),
             missionName = launch.missionName,
@@ -56,30 +105,13 @@ class RocketLaunchRepository(databaseDriverFactory: DatabaseDriverFactory) {
         )
     }
 
-    private fun mapLaunchSelecting(
-        id: Long,
-        flightNumber: Long,
+    private val mapLaunchSelecting: (
+        id: Long?,
         missionName: String,
-        details: String?,
-        launchSuccess: Boolean?,
         launchDateUTC: String,
-        patchUrlSmall: String?,
-        patchUrlLarge: String?,
-        articleUrl: String?
-    ): RocketLaunch {
-        return RocketLaunch(
-            flightNumber = flightNumber.toInt(),
-            missionName = missionName,
-            details = details,
-            launchDateUTC = launchDateUTC,
-            launchSuccess = launchSuccess,
-            links = Links(
-                patch = Patch(
-                    small = patchUrlSmall,
-                    large = patchUrlLarge
-                ),
-                article = articleUrl
-            )
-        )
+        details: String?,
+    ) -> RocketLaunch = { id, missionName, launchDateUTC, details ->
+        RocketLaunch(id ?: 1L, missionName, launchDateUTC, details)
     }
+
 }

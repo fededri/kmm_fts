@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
+import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import com.fededri.kmmfts.DatabaseDriverFactory
 import com.fededri.kmmfts.RocketLaunchRepository
@@ -16,12 +17,13 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 data class State(
-    val didFinishRequest: Boolean = false,
+    val didFinishDownloadingLaunches: Boolean = false,
+    val ftsEnabled: Boolean = false,
+    val isLoading: Boolean = false
 )
 
 class RocketLaunchViewModel(
 ) : ViewModel() {
-
 
     private var _state: MutableStateFlow<State> = MutableStateFlow(State())
     val state: Flow<State>
@@ -29,31 +31,39 @@ class RocketLaunchViewModel(
             return _state.asStateFlow()
         }
 
-    fun flow(driverFactory: DatabaseDriverFactory) = Pager(
-        // Configure how data is loaded by passing additional properties to
-        // PagingConfig, such as prefetchDistance.
-        PagingConfig(pageSize = 20)
-    ) {
-        val repository = RocketLaunchRepository(driverFactory)
-        LaunchDataSource(repository.getPaginatedLaunches())
-    }.flow
-        .cachedIn(viewModelScope)
+    fun flow(
+        driverFactory: DatabaseDriverFactory,
+        searchQuery: String = ""
+    ): Flow<PagingData<RocketLaunch>> {
+        return Pager(
+            // Configure how data is loaded by passing additional properties to
+            // PagingConfig, such as prefetchDistance.
+            PagingConfig(pageSize = 20)
+        ) {
+            val repository = RocketLaunchRepository(driverFactory)
+            Log.i("RocketLaunchViewModel", "generating data source, fts enabled ${_state.value.ftsEnabled}")
+            LaunchDataSource(
+                repository.getPaginatedLaunchesBySearch(
+                    searchQuery,
+                    _state.value.ftsEnabled
+                )
+            )
+        }.flow
+    }
+
+    fun toggleFts(enabled: Boolean) {
+        _state.value = _state.value.copy(ftsEnabled = enabled)
+    }
 
     fun fetchRocketLaunches(sdk: SpaceXSDK) {
         viewModelScope.launch {
             try {
                 sdk.getLaunchesFromServer {
-                    _state.value = _state.value.copy(didFinishRequest = true)
+                    _state.value = _state.value.copy(didFinishDownloadingLaunches = true)
                 }
             } catch (e: Exception) {
                 Log.e("Rocket launch", "something went wrong!")
             }
-        }
-    }
-
-    fun searchRocketLaunches(searchQuery: String) {
-        viewModelScope.launch {
-
         }
     }
 }

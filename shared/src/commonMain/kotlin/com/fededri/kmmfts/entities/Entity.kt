@@ -6,8 +6,15 @@ import kotlinx.datetime.toLocalDateTime
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
-@Serializable
 data class RocketLaunch(
+    val id: Long,
+    val missionName: String,
+    val launchDateUTC: String,
+    val details: String?,
+)
+
+@Serializable
+data class RocketLaunchJson(
     @SerialName("flight_number")
     val flightNumber: Int,
     @SerialName("name")

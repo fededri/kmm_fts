@@ -30,7 +30,8 @@ class QueryPagingSource<T : Any>(
             val savedPage = loadedPages[pageNumber]
             if (savedPage != null) return@withLock savedPage
 
-            val page = searchQueryGetter(pageNumber.toLong() * pageSize, pageSize).executeAsList()
+            val page = searchQueryGetter(getOffset(pageNumber), pageSize).executeAsList()
+            loadedPages[pageNumber] = page
             page
         }
 
@@ -40,6 +41,14 @@ class QueryPagingSource<T : Any>(
             LoadResult(page, pageNumber + 1)
         } else {
             LoadResult(page, null)
+        }
+    }
+
+    private fun getOffset(pageNumber: Int): Long {
+        return if (pageNumber == 1) {
+            0L
+        } else {
+            pageNumber.toLong() * pageSize
         }
     }
 
